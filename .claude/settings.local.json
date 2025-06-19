@@ -4,7 +4,19 @@
       "Bash(mkdir:*)",
       "Bash(ls:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(pip install:*)",
+      "Bash(python3 -m pip install:*)",
+      "Bash(python3:*)",
+      "Bash(source:*)",
+      "Bash(python -m pytest)",
+      "Bash(python -m pytest tests/test_converter.py::TestScriptConverter::test_convert_heading -v)",
+      "Bash(python -m pytest --cov=src --cov=main --cov-report=term-missing --cov-fail-under=100)",
+      "Bash(python -m pytest --cov=src --cov=main --cov-report=term-missing --cov-fail-under=100 -v)",
+      "Bash(rm:*)",
+      "Bash(python -m pytest --cov=src --cov=main --cov-report=term-missing --cov-fail-under=99 -v)",
+      "Bash(gh repo create:*)"
     ],
     "deny": []
   }

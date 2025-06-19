@@ -101,17 +101,15 @@ class ScriptConverter:
     
     def _convert_heading(self, paragraph: str) -> str:
         """見出しをHTMLに変換"""
-        level = 0
+        original_level = 0
         for char in paragraph:
             if char == '#':
-                level += 1
+                original_level += 1
             else:
                 break
         
-        if level > 6:
-            level = 6
-        
-        heading_text = paragraph[level:].strip()
+        level = min(original_level, 6)
+        heading_text = paragraph[original_level:].strip()
         return f'        <h{level}>{self._escape_html(heading_text)}</h{level}>'
     
     def _convert_dialogue(self, paragraph: str) -> str:
