@@ -38,8 +38,18 @@ class ScriptConverter:
     
     def _read_text_file(self, file_path: Path) -> str:
         """テキストファイルを読み込み"""
-        with open(file_path, 'r', encoding='utf-8') as f:
-            return f.read()
+        # エンコーディング検出
+        encodings = ['utf-8', 'shift_jis', 'cp932', 'euc-jp', 'iso-2022-jp']
+        
+        for encoding in encodings:
+            try:
+                with open(file_path, 'r', encoding=encoding) as f:
+                    return f.read()
+            except UnicodeDecodeError:
+                continue
+        
+        # 全てのエンコーディングが失敗した場合はエラー
+        raise ValueError(f"ファイルのエンコーディングを特定できませんでした: {file_path}")
     
     def _read_docx_file(self, file_path: Path) -> str:
         """Word文書を読み込み"""
