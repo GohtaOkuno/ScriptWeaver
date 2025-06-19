@@ -197,3 +197,51 @@ class TestScriptConverter:
         converter = ScriptConverter()
         assert 'body {' in converter.css_template
         assert 'font-family:' in converter.css_template
+    
+    def test_sample_scenario_conversion(self):
+        """サンプルシナリオ変換テスト"""
+        # サンプルファイルのパス
+        sample_file = Path("samples/input/sample_scenario.txt")
+        expected_file = Path("samples/expected_output/sample_scenario.html")
+        
+        # サンプルファイルが存在することを確認
+        if not sample_file.exists():
+            pytest.skip("サンプルファイルが存在しません")
+        
+        # 変換実行
+        output_file = self.converter.convert(sample_file)
+        
+        # 基本的な構造の確認
+        html_content = output_file.read_text(encoding='utf-8')
+        assert '<!DOCTYPE html>' in html_content
+        assert '<html lang="ja">' in html_content
+        assert '<h1>森の中の古い館</h1>' in html_content
+        assert '<h2>プロローグ</h2>' in html_content
+        assert '<h2>第1章：館の内部</h2>' in html_content
+        assert '<h3>食堂の調査</h3>' in html_content
+        assert 'dialogue' in html_content  # 会話文のクラスが含まれていることを確認
+        
+        # クリーンアップ
+        if output_file.exists():
+            output_file.unlink()
+    
+    def test_sample_dialogue_detection(self):
+        """サンプルシナリオの会話文検出テスト"""
+        content = """
+# テストシナリオ
+
+「何だ、この古い建物は...」
+冒険者の一人が呟く。
+
+「まるで、住人が突然いなくなったようだ」
+
+「この彫像...何かがおかしい」
+        """.strip()
+        
+        html_result = self.converter._convert_to_html(content)
+        
+        # 会話文が適切に検出・変換されていることを確認
+        assert 'dialogue-paragraph' in html_result
+        assert '「何だ、この古い建物は...」' in html_result
+        assert '「まるで、住人が突然いなくなったようだ」' in html_result
+        assert '「この彫像...何かがおかしい」' in html_result
