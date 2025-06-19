@@ -2,13 +2,17 @@
 converter.pyのテストコード
 """
 
-import pytest
+import unittest
 import tempfile
 import shutil
 from pathlib import Path
 from unittest.mock import patch, mock_open, MagicMock
-from docx import Document
-from docx.text.paragraph import Paragraph
+try:
+    from docx import Document
+    from docx.text.paragraph import Paragraph
+    DOCX_AVAILABLE = True
+except ImportError:
+    DOCX_AVAILABLE = False
 
 from src.converter import ScriptConverter
 
@@ -407,3 +411,93 @@ class TestScriptConverter:
         
         # 会話文の変換確認
         assert 'dialogue-paragraph' in html_result
+    
+    def test_is_table(self):
+        """表の判定テスト"""
+        # パイプ文字とセパレータがある表
+        table_text = """時刻　| 出来事
+------|-----------------------------------------------
+14:00 | PCの乗る「宇江田バス」久禮波駅着
+17:30 | 防潮壁で低い軋み音（初〈聞き耳〉）"""
+        assert self.converter._is_table(table_text) == True
+        
+        # パイプ文字だけの表（セパレータなし）
+        simple_table = """項目 | 値
+データ1 | 結果1
+データ2 | 結果2"""
+        assert self.converter._is_table(simple_table) == True
+        
+        # 通常の段落
+        normal_text = "これは通常の段落です。表ではありません。"
+        assert self.converter._is_table(normal_text) == False
+        
+        # 1行だけの場合
+        single_line = "項目 | 値"
+        assert self.converter._is_table(single_line) == False
+    
+    def test_convert_table(self):
+        """表の変換テスト"""
+        table_text = """時刻　| 出来事
+------|-----------------------------------------------
+14:00 | PCの乗る「宇江田バス」久禮波駅着
+17:30 | 防潮壁で低い軋み音（初〈聞き耳〉）
+19:00 | 町内放送「潮鳴祭の復活」を宣言"""
+        
+        result = self.converter._convert_table(table_text)
+        
+        # テーブル要素の確認
+        assert '<table class="scenario-table">' in result
+        assert '<thead>' in result
+        assert '<tbody>' in result
+        assert '<th>時刻</th>' in result
+        assert '<th>出来事</th>' in result
+        assert '<td>14:00</td>' in result
+        assert '<td>PCの乗る「宇江田バス」久禮波駅着</td>' in result
+        
+        # CoC要素も変換されることを確認
+        assert '〈聞き耳〉' in result
+    
+    def test_convert_table_with_coc_elements(self):
+        """CoC要素を含む表の変換テスト"""
+        table_text = """項目　　　| 成功/取得条件 | SAN変化
+------------|---------------|---------
+封印成功　　| 扉破壊＋符　 | +1D6
+逃走成功　　| 全員生還　　 | +1D4
+深尾を保護　| 廃屋で同行　| +1"""
+        
+        result = self.converter._convert_table(table_text)
+        
+        # テーブル構造の確認
+        assert '<table class="scenario-table">' in result
+        assert '<th>項目</th>' in result
+        assert '<th>成功/取得条件</th>' in result
+        assert '<th>SAN変化</th>' in result
+        
+        # CoC要素の変換確認
+        assert '+1D6' in result  # ダイス表記
+        assert '+1D4' in result  # ダイス表記
+        
+    def test_table_in_paragraph_conversion(self):
+        """段落変換での表認識テスト"""
+        content = """# タイムライン
+
+時刻　| 出来事
+------|-----------------------------------------------
+14:00 | PCの乗る「宇江田バス」久禮波駅着
+17:30 | 防潮壁で低い軋み音
+
+通常の段落です。"""
+        
+        html_result = self.converter._convert_to_html(content)
+        
+        # 見出しの変換確認
+        assert '<h1>タイムライン</h1>' in html_result
+        
+        # 表の変換確認
+        assert '<table class="scenario-table">' in html_result
+        assert '<th>時刻</th>' in html_result
+        assert '<th>出来事</th>' in html_result
+        assert '<td>14:00</td>' in html_result
+        
+        # 通常段落の確認
+        assert '<p>通常の段落です。</p>' in html_result

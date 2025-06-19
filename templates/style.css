@@ -166,6 +166,257 @@ p {
     font-size: 0.9em;
 }
 
+/* 表スタイル */
+.scenario-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.scenario-table th {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    font-weight: 600;
+    padding: 15px 12px;
+    text-align: left;
+    border-bottom: 2px solid #2980b9;
+}
+
+.scenario-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: top;
+}
+
+.scenario-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.scenario-table tr:hover {
+    background-color: #e3f2fd;
+    transition: background-color 0.2s ease;
+}
+
+.scenario-table th:first-child,
+.scenario-table td:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* セクション区切り */
+.section-divider {
+    border: none;
+    height: 3px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    margin: 30px 0;
+    border-radius: 2px;
+}
+
+/* 定義リスト */
+.scenario-definitions {
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-left: 5px solid #3498db;
+    border-radius: 0 8px 8px 0;
+}
+
+.scenario-definitions dt {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 1.05em;
+}
+
+.scenario-definitions dt:first-child {
+    margin-top: 0;
+}
+
+.scenario-definitions dd {
+    margin-left: 0;
+    margin-bottom: 8px;
+    padding-left: 20px;
+    color: #495057;
+    line-height: 1.6;
+}
+
+/* 箇条書き */
+.scenario-bullets {
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+    border-left: 5px solid #ffc107;
+    border-radius: 0 8px 8px 0;
+    list-style: none;
+}
+
+.scenario-bullets li {
+    margin-bottom: 12px;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.6;
+}
+
+.scenario-bullets li:before {
+    content: "•";
+    color: #ffc107;
+    font-size: 1.2em;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.scenario-bullets li:last-child {
+    margin-bottom: 0;
+}
+
+/* NPCステータスブロック */
+.npc-status-block {
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f1f3f4 0%, #e8eaf6 100%);
+    border-left: 5px solid #9c27b0;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 2px 8px rgba(156, 39, 176, 0.1);
+}
+
+.npc-name {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #4a148c;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #9c27b0;
+    padding-bottom: 5px;
+}
+
+.npc-note {
+    font-size: 0.9em;
+    color: #6a1b9a;
+    font-style: italic;
+    margin-bottom: 8px;
+}
+
+.npc-stats {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    background-color: rgba(156, 39, 176, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 0.95em;
+    border: 1px solid rgba(156, 39, 176, 0.2);
+}
+
+.npc-skills {
+    margin: 8px 0;
+    padding: 8px 12px;
+    background-color: rgba(33, 150, 243, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #2196f3;
+}
+
+.npc-equipment {
+    margin: 8px 0;
+    padding: 8px 12px;
+    background-color: rgba(255, 152, 0, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #ff9800;
+}
+
+.npc-attacks {
+    margin: 8px 0;
+    padding: 8px 12px;
+    background-color: rgba(244, 67, 54, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #f44336;
+    font-weight: 600;
+}
+
+.npc-other {
+    margin: 6px 0;
+    padding: 6px 0;
+    color: #555;
+    line-height: 1.5;
+}
+
+/* 目次スタイル */
+.table-of-contents {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border: 2px solid #3498db;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 30px 0;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+}
+
+.toc-title {
+    color: #2c3e50;
+    font-size: 1.4em;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    text-align: center;
+}
+
+.toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-list li {
+    margin: 8px 0;
+}
+
+.toc-level-1 {
+    font-weight: 600;
+    font-size: 1.1em;
+    margin: 12px 0;
+}
+
+.toc-level-2 {
+    margin-left: 20px;
+    font-size: 1.05em;
+}
+
+.toc-level-3 {
+    margin-left: 40px;
+    font-size: 1em;
+    color: #6c757d;
+}
+
+.toc-list a {
+    color: #2980b9;
+    text-decoration: none;
+    display: block;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.toc-list a:hover {
+    background-color: #e3f2fd;
+    border-left-color: #3498db;
+    color: #1976d2;
+    transform: translateX(5px);
+}
+
+.toc-level-1 a {
+    font-weight: 600;
+    border-left-width: 4px;
+}
+
+.toc-level-1 a:hover {
+    background-color: #e8f4fd;
+    border-left-color: #2980b9;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     .container {
@@ -196,5 +447,82 @@ p {
     .coc-skill, .coc-item, .coc-dice, .coc-san, .coc-symbol {
         padding: 1px 4px;
         font-size: 0.9em;
+    }
+    
+    .scenario-table {
+        font-size: 0.85em;
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+    
+    .scenario-table th,
+    .scenario-table td {
+        padding: 8px 6px;
+        min-width: 80px;
+    }
+    
+    .scenario-definitions,
+    .scenario-bullets {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .scenario-definitions dt {
+        font-size: 1em;
+    }
+    
+    .scenario-bullets li {
+        padding-left: 15px;
+        margin-bottom: 8px;
+    }
+    
+    .npc-status-block {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .npc-name {
+        font-size: 1.2em;
+    }
+    
+    .npc-stats {
+        font-size: 0.85em;
+        padding: 8px;
+    }
+    
+    .npc-skills,
+    .npc-equipment,
+    .npc-attacks {
+        padding: 6px 10px;
+        margin: 6px 0;
+    }
+    
+    .table-of-contents {
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .toc-title {
+        font-size: 1.2em;
+    }
+    
+    .toc-level-1 {
+        font-size: 1em;
+        margin: 10px 0;
+    }
+    
+    .toc-level-2 {
+        margin-left: 15px;
+        font-size: 0.95em;
+    }
+    
+    .toc-level-3 {
+        margin-left: 25px;
+        font-size: 0.9em;
+    }
+    
+    .toc-list a {
+        padding: 6px 10px;
     }
 }
