@@ -16,7 +16,13 @@
       "Bash(python -m pytest --cov=src --cov=main --cov-report=term-missing --cov-fail-under=100 -v)",
       "Bash(rm:*)",
       "Bash(python -m pytest --cov=src --cov=main --cov-report=term-missing --cov-fail-under=99 -v)",
-      "Bash(gh repo create:*)"
+      "Bash(gh repo create:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python:*)",
+      "Bash(git restore:*)"
     ],
     "deny": []
   }
