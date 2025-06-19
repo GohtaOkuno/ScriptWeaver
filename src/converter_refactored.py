@@ -79,7 +79,7 @@ class ScriptConverter:
         
         # バリデーション実行（オプション）
         validation_report = None
-        if self.validation_engine and (include_validation_report or self.config.strict_mode):
+        if self.validation_engine and include_validation_report:
             validation_report = self.validation_engine.validate_document(content)
             
             # 厳密モードで重大エラーがある場合は変換を停止

@@ -21,7 +21,7 @@ class ScriptConverter:
     既存のAPIとの互換性を保持するラッパークラス
     """
     
-    def __init__(self, enable_validation: bool = True):
+    def __init__(self, enable_validation: bool = False):
         """
         初期化（既存APIとの互換性維持）
         

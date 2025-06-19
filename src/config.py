@@ -28,7 +28,7 @@ class ScriptWeaverConfig:
     toc_title: str = '目次'
     
     # バリデーション設定
-    enable_validation: bool = True
+    enable_validation: bool = False
     strict_mode: bool = False
     trpg_system: str = "CoC6"
     custom_skills: List[str] = field(default_factory=list)
