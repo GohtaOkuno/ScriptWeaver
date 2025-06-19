@@ -62,10 +62,27 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Output files
+# Output files (except sample templates)
 *.html
+!samples/expected_output/*.html
 test_*.txt
 test_*.docx
+
+# Development reference materials (third-party content)
+references/
+!/references/README.md
+
+# Claude Code settings (local only)
+.claude/settings.local.json
+
+# Temporary development files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Log files
+*.log
 
 # Coverage reports
 htmlcov/
