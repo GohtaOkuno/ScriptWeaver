@@ -62,11 +62,17 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
+# ScriptWeaver specific
 # Output files (except sample templates)
 *.html
 !samples/expected_output/*.html
 test_*.txt
 test_*.docx
+
+# Input/Output directories for testing
+input/
+output/
+converted/
 
 # Development reference materials (third-party content)
 references/
@@ -74,6 +80,7 @@ references/
 
 # Claude Code settings (local only)
 .claude/settings.local.json
+.claude/
 
 # Temporary development files
 *.tmp
