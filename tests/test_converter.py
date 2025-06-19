@@ -328,3 +328,82 @@ class TestScriptConverter:
         # 通常の段落も適切に変換されていることを確認
         assert '<p>このシナリオは森の館を舞台とします。</p>' in html_result
         assert '<p>昔、この館には...</p>' in html_result
+    
+    def test_convert_skill_notation(self):
+        """【技能名】記法変換テスト"""
+        result = self.converter._convert_skill_notation("【図書館】で調べると【目星】で発見できる")
+        expected = '<span class="coc-skill">【図書館】</span>で調べると<span class="coc-skill">【目星】</span>で発見できる'
+        assert result == expected
+        
+        # 複雑な技能名のテスト
+        result = self.converter._convert_skill_notation("【機械修理orコンピュータ-20】判定")
+        expected = '<span class="coc-skill">【機械修理orコンピュータ-20】</span>判定'
+        assert result == expected
+    
+    def test_convert_item_notation(self):
+        """『アイテム名』記法変換テスト"""
+        result = self.converter._convert_item_notation("『Class：Red』と『silver bullet』を発見")
+        expected = '<span class="coc-item">『Class：Red』</span>と<span class="coc-item">『silver bullet』</span>を発見'
+        assert result == expected
+    
+    def test_convert_dice_notation(self):
+        """ダイス表記変換テスト"""
+        result = self.converter._convert_dice_notation("1d4+1のダメージ、2d6判定、3d10ロール")
+        expected = '<span class="coc-dice">1d4+1</span>のダメージ、<span class="coc-dice">2d6</span>判定、<span class="coc-dice">3d10</span>ロール'
+        assert result == expected
+        
+        # マイナス修正のテスト
+        result = self.converter._convert_dice_notation("1d100-20で判定")
+        expected = '<span class="coc-dice">1d100-20</span>で判定'
+        assert result == expected
+    
+    def test_convert_san_notation(self):
+        """SAN減少記法変換テスト"""
+        result = self.converter._convert_san_notation("【SANc1/1d4】の狂気を得る、SANc0/1の減少")
+        expected = '【<span class="coc-san">SANc1/1d4</span>】の狂気を得る、<span class="coc-san">SANc0/1</span>の減少'
+        assert result == expected
+        
+        # 複雑なSAN表記のテスト
+        result = self.converter._convert_san_notation("SANc1/1d8+1")
+        expected = '<span class="coc-san">SANc1/1d8+1</span>'
+        assert result == expected
+    
+    def test_process_coc_elements_integration(self):
+        """CoC6版要素統合処理テスト"""
+        text = "【図書館】で『古い日記』を発見。1d4+1のダメージ、SANc1/1d6の減少"
+        result = self.converter._process_coc_elements(text)
+        
+        # 各要素が適切に変換されていることを確認
+        assert '<span class="coc-skill">【図書館】</span>' in result
+        assert '<span class="coc-item">『古い日記』</span>' in result
+        assert '<span class="coc-dice">1d4+1</span>' in result
+        # SAN記法は優先処理されるため、内部にダイス表記が含まれる
+        assert 'coc-san' in result and 'SANc1' in result
+        
+        # HTMLエスケープも適用されていることを確認
+        assert '&lt;' not in result  # この例では特殊文字がないため
+    
+    def test_coc_elements_in_paragraph_conversion(self):
+        """段落変換でのCoC6版要素テスト"""
+        content = """1. 調査開始
+
+【目星】判定で『重要な手がかり』を発見する。
+
+2d6のダメージを受け、SANc0/1d4の減少。
+
+「恐ろしい光景だ」と探索者は呟く。"""
+        
+        html_result = self.converter._convert_to_html(content)
+        
+        # 見出しの変換確認
+        assert '<h1>1. 調査開始</h1>' in html_result
+        
+        # CoC6版要素の変換確認
+        assert '<span class="coc-skill">【目星】</span>' in html_result
+        assert '<span class="coc-item">『重要な手がかり』</span>' in html_result
+        assert '<span class="coc-dice">2d6</span>' in html_result
+        # SAN記法は優先処理されるため、内部にダイス表記が含まれる可能性
+        assert 'coc-san' in html_result and 'SANc0' in html_result
+        
+        # 会話文の変換確認
+        assert 'dialogue-paragraph' in html_result

@@ -24,7 +24,12 @@
       "Bash(python:*)",
       "Bash(git restore:*)",
       "Bash(git pull:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(gh issue comment:*)",
+      "Bash(pip3 install:*)",
+      "Bash(pdftotext:*)",
+      "Bash(brew install:*)",
+      "Bash(gh issue:*)"
     ],
     "deny": []
   }

@@ -96,9 +96,10 @@ class ScriptConverter:
             # 会話文の処理（「」で囲まれた文）
             elif '「' in paragraph and '」' in paragraph:
                 html_parts.append(self._convert_dialogue(paragraph))
-            # 通常の段落
+            # 通常の段落（CoC6版要素を含む可能性）
             else:
-                html_parts.append(f'        <p>{self._escape_html(paragraph)}</p>')
+                processed_paragraph = self._process_coc_elements(paragraph)
+                html_parts.append(f'        <p>{processed_paragraph}</p>')
         
         return '\n'.join(html_parts)
     
@@ -176,6 +177,64 @@ class ScriptConverter:
                    .replace('>', '&gt;')
                    .replace('"', '&quot;')
                    .replace("'", '&#x27;'))
+    
+    def _process_coc_elements(self, text: str) -> str:
+        """CoC6版特有要素を処理"""
+        # まずHTMLエスケープを実行
+        escaped_text = self._escape_html(text)
+        
+        # エスケープ後のテキストに対してCoC6版変換を適用
+        # 優先順位：SAN記法 > ダイス表記 > 技能 > アイテム
+        # SAN減少記法の処理（ダイス表記を含むため先に処理）
+        escaped_text = self._convert_san_notation_escaped(escaped_text)
+        # ダイス表記の処理
+        escaped_text = self._convert_dice_notation_escaped(escaped_text)
+        # 【技能】記法の処理
+        escaped_text = self._convert_skill_notation_escaped(escaped_text)
+        # 『アイテム』記法の処理  
+        escaped_text = self._convert_item_notation_escaped(escaped_text)
+        
+        return escaped_text
+    
+    def _convert_skill_notation(self, text: str) -> str:
+        """【技能名】記法をHTMLに変換"""
+        pattern = r'【([^】]+)】'
+        return re.sub(pattern, r'<span class="coc-skill">【\1】</span>', text)
+    
+    def _convert_skill_notation_escaped(self, text: str) -> str:
+        """【技能名】記法をHTMLに変換（エスケープ済みテキスト用）"""
+        pattern = r'【([^】]+)】'
+        return re.sub(pattern, r'<span class="coc-skill">【\1】</span>', text)
+    
+    def _convert_item_notation(self, text: str) -> str:
+        """『アイテム名』記法をHTMLに変換"""
+        pattern = r'『([^』]+)』'
+        return re.sub(pattern, r'<span class="coc-item">『\1』</span>', text)
+    
+    def _convert_item_notation_escaped(self, text: str) -> str:
+        """『アイテム名』記法をHTMLに変換（エスケープ済みテキスト用）"""
+        pattern = r'『([^』]+)』'
+        return re.sub(pattern, r'<span class="coc-item">『\1』</span>', text)
+    
+    def _convert_dice_notation(self, text: str) -> str:
+        """ダイス表記をHTMLに変換"""
+        pattern = r'(\d+d\d+(?:[+\-]\d+)?)'
+        return re.sub(pattern, r'<span class="coc-dice">\1</span>', text)
+    
+    def _convert_dice_notation_escaped(self, text: str) -> str:
+        """ダイス表記をHTMLに変換（エスケープ済みテキスト用）"""
+        pattern = r'(\d+d\d+(?:[+\-]\d+)?)'
+        return re.sub(pattern, r'<span class="coc-dice">\1</span>', text)
+    
+    def _convert_san_notation(self, text: str) -> str:
+        """SAN減少記法をHTMLに変換"""
+        pattern = r'(SANc?\d+/\d+(?:d\d+)?(?:[+\-]\d+)?)'
+        return re.sub(pattern, r'<span class="coc-san">\1</span>', text)
+    
+    def _convert_san_notation_escaped(self, text: str) -> str:
+        """SAN減少記法をHTMLに変換（エスケープ済みテキスト用）"""
+        pattern = r'(SANc?\d+/\d+(?:d\d+)?(?:[+\-]\d+)?)'
+        return re.sub(pattern, r'<span class="coc-san">\1</span>', text)
     
     def _load_css_template(self) -> str:
         """CSSテンプレートを読み込み"""

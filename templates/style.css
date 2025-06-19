@@ -82,6 +82,90 @@ p {
     box-shadow: 0 2px 8px rgba(231, 76, 60, 0.1);
 }
 
+/* CoC6版専用スタイル */
+.coc-skill {
+    color: #2980b9;
+    font-weight: bold;
+    background-color: #ebf3fd;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #bee5eb;
+    font-size: 0.95em;
+}
+
+.coc-item {
+    color: #27ae60;
+    font-style: italic;
+    background-color: #eafaf1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #c3e6cb;
+    font-size: 0.95em;
+}
+
+.coc-dice {
+    color: #e74c3c;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-weight: bold;
+    background-color: #fdf2f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+    font-size: 0.9em;
+}
+
+.coc-san {
+    color: #8e44ad;
+    font-weight: bold;
+    background-color: #f8f4fd;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #e1bee7;
+    font-size: 0.95em;
+}
+
+.coc-symbol {
+    color: #6c757d;
+    font-weight: bold;
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    font-size: 0.9em;
+}
+
+/* CoC6版判定結果の条件分岐スタイル */
+.coc-result-success {
+    color: #28a745;
+    font-weight: 600;
+    margin-left: 20px;
+}
+
+.coc-result-failure {
+    color: #dc3545;
+    font-weight: 600;
+    margin-left: 20px;
+}
+
+/* CoC6版特殊記号スタイル */
+.coc-handout {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-left: 5px solid #ffc107;
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.coc-npc-status {
+    background: linear-gradient(135deg, #e2e3e5 0%, #f8f9fa 100%);
+    border-left: 5px solid #6c757d;
+    padding: 12px 18px;
+    margin: 15px 0;
+    border-radius: 0 6px 6px 0;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     .container {
@@ -96,5 +180,21 @@ p {
     .dialogue-paragraph {
         padding: 15px 20px;
         margin: 20px 0;
+    }
+    
+    .coc-handout {
+        padding: 12px 15px;
+        margin: 15px 0;
+    }
+    
+    .coc-npc-status {
+        padding: 10px 15px;
+        margin: 12px 0;
+        font-size: 0.85em;
+    }
+    
+    .coc-skill, .coc-item, .coc-dice, .coc-san, .coc-symbol {
+        padding: 1px 4px;
+        font-size: 0.9em;
     }
 }
