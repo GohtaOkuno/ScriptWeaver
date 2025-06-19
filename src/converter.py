@@ -12,14 +12,36 @@ try:
 except ImportError:
     DOCX_AVAILABLE = False
 
+try:
+    from .validation import (
+        ValidationEngine, ValidationConfig, SkillValidator, 
+        HeadingValidator, DiceValidator
+    )
+    VALIDATION_AVAILABLE = True
+except ImportError:
+    VALIDATION_AVAILABLE = False
+
 
 class ScriptConverter:
     """スクリプト変換処理クラス"""
     
-    def __init__(self):
+    def __init__(self, enable_validation: bool = True):
         self.css_template = self._load_css_template()
+        self.enable_validation = enable_validation and VALIDATION_AVAILABLE
+        
+        # バリデーションエンジンの初期化
+        if self.enable_validation:
+            self.validation_config = ValidationConfig()
+            self.validation_engine = ValidationEngine(self.validation_config)
+            
+            # バリデータを登録
+            self.validation_engine.register_validator(SkillValidator(self.validation_config))
+            self.validation_engine.register_validator(HeadingValidator(self.validation_config))
+            self.validation_engine.register_validator(DiceValidator(self.validation_config))
+        else:
+            self.validation_engine = None
     
-    def convert(self, input_file: Path) -> Path:
+    def convert(self, input_file: Path, include_validation_report: bool = False) -> Path:
         """入力ファイルをHTMLに変換"""
         if input_file.suffix.lower() == '.txt':
             content = self._read_text_file(input_file)
@@ -28,13 +50,32 @@ class ScriptConverter:
         else:
             raise ValueError(f"対応していない形式: {input_file.suffix}")
         
-        html_content = self._convert_to_html(content)
+        # バリデーション実行
+        validation_report = None
+        if self.enable_validation:
+            validation_report = self.validation_engine.validate_document(content)
+        
+        html_content = self._convert_to_html(content, validation_report if include_validation_report else None)
         output_file = input_file.with_suffix('.html')
         
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
         
         return output_file
+    
+    def validate_only(self, input_file: Path):
+        """バリデーションのみ実行（変換はしない）"""
+        if not self.enable_validation:
+            raise RuntimeError("バリデーション機能が無効化されています")
+        
+        if input_file.suffix.lower() == '.txt':
+            content = self._read_text_file(input_file)
+        elif input_file.suffix.lower() == '.docx':
+            content = self._read_docx_file(input_file)
+        else:
+            raise ValueError(f"対応していない形式: {input_file.suffix}")
+        
+        return self.validation_engine.validate_document(content)
     
     def _read_text_file(self, file_path: Path) -> str:
         """テキストファイルを読み込み"""
@@ -65,7 +106,7 @@ class ScriptConverter:
         
         return '\n\n'.join(paragraphs)
     
-    def _convert_to_html(self, content: str) -> str:
+    def _convert_to_html(self, content: str, validation_report=None) -> str:
         """テキストをHTMLに変換"""
         paragraphs = self._split_paragraphs(content)
         
@@ -76,9 +117,18 @@ class ScriptConverter:
         # 段落をHTMLに変換（見出しIDを付与）
         html_body = self._process_paragraphs(paragraphs, headings)
         
+        # バリデーションレポートを挿入（オプション）
+        validation_html = ""
+        if validation_report:
+            validation_html = self._generate_validation_html(validation_report)
+        
         # 目次を本文の前に挿入
         if toc_html:
             html_body = f"{toc_html}\n{html_body}"
+        
+        # バリデーションレポートを先頭に挿入
+        if validation_html:
+            html_body = f"{validation_html}\n{html_body}"
         
         html_template = f"""<!DOCTYPE html>
 <html lang="ja">
@@ -617,6 +667,47 @@ class ScriptConverter:
             else:
                 if line.strip():
                     html += f'            <div class="npc-other">{self._process_coc_elements(line)}</div>\n'
+        
+        html += '        </div>'
+        return html
+    
+    def _generate_validation_html(self, validation_report) -> str:
+        """バリデーションレポートのHTML生成"""
+        if not validation_report or len(validation_report.results) == 0:
+            return ""
+        
+        html = '        <div class="validation-report">\n'
+        html += '            <h2 class="validation-title">📋 記法チェック結果</h2>\n'
+        
+        # サマリー表示
+        summary = validation_report.summary
+        if summary["critical"] > 0:
+            html += f'            <div class="validation-summary critical">🚨 重大エラー: {summary["critical"]}個</div>\n'
+        if summary["warning"] > 0:
+            html += f'            <div class="validation-summary warning">⚠️ 警告: {summary["warning"]}個</div>\n'
+        if summary["info"] > 0:
+            html += f'            <div class="validation-summary info">ℹ️ 情報: {summary["info"]}個</div>\n'
+        if summary["suggestion"] > 0:
+            html += f'            <div class="validation-summary suggestion">💡 提案: {summary["suggestion"]}個</div>\n'
+        
+        # 詳細結果
+        if validation_report.results:
+            html += '            <div class="validation-details">\n'
+            for result in validation_report.results:
+                level_class = result.level.value
+                line_info = f"{result.line_number}行目: " if result.line_number else ""
+                
+                html += f'                <div class="validation-item {level_class}">\n'
+                html += f'                    <div class="validation-message">{line_info}{self._escape_html(result.message)}</div>\n'
+                
+                if result.suggestion:
+                    html += f'                    <div class="validation-suggestion">💡 {self._escape_html(result.suggestion)}</div>\n'
+                
+                if result.proposed_fix:
+                    html += f'                    <div class="validation-fix">✏️ 修正案: {self._escape_html(result.proposed_fix)}</div>\n'
+                
+                html += '                </div>\n'
+            html += '            </div>\n'
         
         html += '        </div>'
         return html
