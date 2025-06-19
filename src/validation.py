@@ -167,12 +167,17 @@ class ValidationEngine:
                 validator_results = validator.validate(line, line_number)
                 results.extend(validator_results)
             except Exception as e:
+                # ログ出力（デバッグ用）
+                import logging
+                logging.error(f"バリデータ '{validator.get_name()}' でエラーが発生: {e}", exc_info=True)
+                
                 # バリデータエラーをCRITICALとして記録
                 error_result = ValidationResult(
                     level=ValidationLevel.CRITICAL,
                     message=f"バリデータエラー ({validator.get_name()}): {str(e)}",
                     line_number=line_number,
-                    code="VALIDATOR_ERROR"
+                    code="VALIDATOR_ERROR",
+                    original_text=line[:100]  # 最初の100文字のみ保存
                 )
                 results.append(error_result)
         

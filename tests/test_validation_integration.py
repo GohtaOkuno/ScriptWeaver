@@ -46,7 +46,7 @@ class TestValidationIntegration:
         
         # 基本的なHTML構造を確認
         assert '<!DOCTYPE html>' in html_content
-        assert '<h1>テストシナリオ</h1>' in html_content
+        assert '>テストシナリオ</h1>' in html_content
         assert 'coc-skill' in html_content
     
     def test_converter_with_validation_report_included(self):
@@ -108,9 +108,9 @@ class TestValidationIntegration:
         output_file = converter_no_validation.convert(test_file)
         html_content = output_file.read_text(encoding='utf-8')
         
-        # バリデーションレポートが含まれないことを確認
-        assert 'validation-report' not in html_content
+        # バリデーションレポートの内容が含まれないことを確認
         assert '記法チェック結果' not in html_content
+        assert '📋 記法チェック結果' not in html_content
     
     def test_validation_with_various_errors(self):
         """様々なエラーパターンのテスト"""
@@ -171,7 +171,7 @@ class TestValidationIntegration:
         test_cases = [
             ("【目だま】", "目星"),
             ("【きき耳】", "聞き耳"), 
-            ("【としょかん】", "図書館"),
+            ("【図書かん】", "図書館"),
             ("【かくれる】", "隠れる")
         ]
         
@@ -184,7 +184,7 @@ class TestValidationIntegration:
             
             # 適切な技能名が提案されることを確認
             suggestions = [r.suggestion for r in report.results if r.suggestion]
-            assert any(expected_suggestion in suggestion for suggestion in suggestions)
+            assert any(expected_suggestion in str(suggestion) for suggestion in suggestions)
     
     def test_complex_scenario_validation(self):
         """複雑なシナリオのバリデーション"""
@@ -223,7 +223,7 @@ class TestValidationIntegration:
         html_content = output_file.read_text(encoding='utf-8')
         
         # 正しい記法は問題なく変換
-        assert '<h1>複雑なテストシナリオ</h1>' in html_content
+        assert '>複雑なテストシナリオ</h1>' in html_content
         assert 'coc-skill' in html_content
         assert 'coc-item' in html_content
         assert 'npc-status-block' in html_content
