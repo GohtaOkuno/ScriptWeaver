@@ -87,9 +87,12 @@ class ScriptConverter:
         html_parts = []
         
         for paragraph in paragraphs:
-            # 見出しの処理
+            # 見出しの処理（#記号形式）
             if paragraph.startswith('#'):
                 html_parts.append(self._convert_heading(paragraph))
+            # 番号付き見出しの処理（1. 2-1. 等）
+            elif self._is_numbered_heading(paragraph):
+                html_parts.append(self._convert_numbered_heading(paragraph))
             # 会話文の処理（「」で囲まれた文）
             elif '「' in paragraph and '」' in paragraph:
                 html_parts.append(self._convert_dialogue(paragraph))
@@ -111,6 +114,49 @@ class ScriptConverter:
         level = min(original_level, 6)
         heading_text = paragraph[original_level:].strip()
         return f'        <h{level}>{self._escape_html(heading_text)}</h{level}>'
+    
+    def _is_numbered_heading(self, paragraph: str) -> bool:
+        """番号付き見出しかどうかを判定"""
+        # 番号付き見出しのパターン（スペースあり・なし両方対応）
+        patterns = [
+            r'^\d+\.\s*.+',           # 1. タイトル または 1.タイトル
+            r'^\d+-\d+\.\s*.+',       # 1-1. サブタイトル または 1-1.サブタイトル
+            r'^\d+-\d+-\d+\.\s*.+',   # 1-1-1. 詳細タイトル または 1-1-1.詳細タイトル
+        ]
+        
+        for pattern in patterns:
+            if re.match(pattern, paragraph):
+                return True
+        return False
+    
+    def _convert_numbered_heading(self, paragraph: str) -> str:
+        """番号付き見出しをHTMLに変換"""
+        # 見出しレベルの判定
+        level = self._determine_heading_level(paragraph)
+        
+        # 番号部分を除いてタイトルテキストを抽出
+        heading_text = self._extract_heading_text(paragraph)
+        
+        return f'        <h{level}>{self._escape_html(paragraph)}</h{level}>'
+    
+    def _determine_heading_level(self, paragraph: str) -> int:
+        """番号付き見出しのレベルを判定"""
+        if re.match(r'^\d+\.\s*.+', paragraph):
+            return 1  # 1. → h1 または 1.xxx → h1
+        elif re.match(r'^\d+-\d+\.\s*.+', paragraph):
+            return 2  # 1-1. → h2 または 1-1.xxx → h2
+        elif re.match(r'^\d+-\d+-\d+\.\s*.+', paragraph):
+            return 3  # 1-1-1. → h3 または 1-1-1.xxx → h3
+        else:
+            return 2  # デフォルト
+    
+    def _extract_heading_text(self, paragraph: str) -> str:
+        """見出しからテキスト部分を抽出"""
+        # 番号部分を除去してタイトルのみを取得（スペースあり・なし両方対応）
+        match = re.match(r'^[\d\-]+\.\s*(.+)', paragraph)
+        if match:
+            return match.group(1)
+        return paragraph
     
     def _convert_dialogue(self, paragraph: str) -> str:
         """会話文をHTMLに変換"""

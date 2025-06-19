@@ -22,7 +22,9 @@
       "Bash(git checkout:*)",
       "Bash(python -m pytest tests/ -v)",
       "Bash(python:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git pull:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

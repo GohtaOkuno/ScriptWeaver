@@ -245,3 +245,86 @@ class TestScriptConverter:
         assert '「何だ、この古い建物は...」' in html_result
         assert '「まるで、住人が突然いなくなったようだ」' in html_result
         assert '「この彫像...何かがおかしい」' in html_result
+    
+    def test_is_numbered_heading(self):
+        """番号付き見出し判定テスト"""
+        # 番号付き見出しのテスト（スペースあり）
+        assert self.converter._is_numbered_heading("1. 概要") == True
+        assert self.converter._is_numbered_heading("2-1. サブセクション") == True
+        assert self.converter._is_numbered_heading("3-2-1. 詳細項目") == True
+        
+        # 番号付き見出しのテスト（スペースなし）
+        assert self.converter._is_numbered_heading("1.概要") == True
+        assert self.converter._is_numbered_heading("2-1.サブセクション") == True
+        assert self.converter._is_numbered_heading("3-2-1.詳細項目") == True
+        
+        # 番号付き見出しではないもの
+        assert self.converter._is_numbered_heading("# 通常の見出し") == False
+        assert self.converter._is_numbered_heading("普通の段落") == False
+        assert self.converter._is_numbered_heading("1 ピリオドなし") == False
+        assert self.converter._is_numbered_heading("a. アルファベットはダメ") == False
+    
+    def test_determine_heading_level(self):
+        """見出しレベル判定テスト"""
+        assert self.converter._determine_heading_level("1. メインタイトル") == 1
+        assert self.converter._determine_heading_level("2. 別のメインタイトル") == 1
+        assert self.converter._determine_heading_level("1-1. サブタイトル") == 2
+        assert self.converter._determine_heading_level("2-3. 別のサブタイトル") == 2
+        assert self.converter._determine_heading_level("1-2-1. 詳細タイトル") == 3
+        assert self.converter._determine_heading_level("3-1-5. 別の詳細") == 3
+    
+    def test_extract_heading_text(self):
+        """見出しテキスト抽出テスト"""
+        assert self.converter._extract_heading_text("1. 概要") == "概要"
+        assert self.converter._extract_heading_text("2-1. 背景情報") == "背景情報"
+        assert self.converter._extract_heading_text("3-2-1. 詳細な説明") == "詳細な説明"
+        assert self.converter._extract_heading_text("10-5-2. 複数桁も対応") == "複数桁も対応"
+    
+    def test_convert_numbered_heading(self):
+        """番号付き見出し変換テスト"""
+        # h1変換テスト
+        result = self.converter._convert_numbered_heading("1. 概要")
+        assert '<h1>1. 概要</h1>' in result
+        
+        # h2変換テスト
+        result = self.converter._convert_numbered_heading("2-1. 背景")
+        assert '<h2>2-1. 背景</h2>' in result
+        
+        # h3変換テスト
+        result = self.converter._convert_numbered_heading("3-1-2. 詳細")
+        assert '<h3>3-1-2. 詳細</h3>' in result
+    
+    def test_numbered_heading_integration(self):
+        """番号付き見出し統合テスト"""
+        content = """1. TRPGシナリオ概要
+
+このシナリオは森の館を舞台とします。
+
+2. 背景設定
+
+昔、この館には...
+
+2-1. 主要NPCについて
+
+館の主人は既に亡くなっており...
+
+2-1-1. 館の主人の詳細
+
+名前: エドワード・ブラックウッド
+
+3. ゲーム進行
+
+以下の手順で進めてください。"""
+        
+        html_result = self.converter._convert_to_html(content)
+        
+        # 各レベルの見出しが適切に変換されていることを確認
+        assert '<h1>1. TRPGシナリオ概要</h1>' in html_result
+        assert '<h1>2. 背景設定</h1>' in html_result
+        assert '<h2>2-1. 主要NPCについて</h2>' in html_result
+        assert '<h3>2-1-1. 館の主人の詳細</h3>' in html_result
+        assert '<h1>3. ゲーム進行</h1>' in html_result
+        
+        # 通常の段落も適切に変換されていることを確認
+        assert '<p>このシナリオは森の館を舞台とします。</p>' in html_result
+        assert '<p>昔、この館には...</p>' in html_result
